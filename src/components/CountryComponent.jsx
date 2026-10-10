@@ -1,24 +1,35 @@
 import "../styles/Country.css";
 import { useState, useEffect } from "react";
-import { useParams } from "react-router";
+import { data, Link, useParams } from "react-router";
 
 function Country() {
   // const countryName = new URLSearchParams(window.location.search).get("name");
   const countryName = useParams().country;
-  console.log(countryName);
   const url = `https://countries.dev/name/${countryName}`;
-
-  const [country, setCountry] = useState(null);
+  const [country, setCountry] = useState({});
 
   useEffect(() => {
     fetch(url)
       .then((res) => res.json())
-      .then(([data]) => setCountry(data));
+      .then(([data]) => {
+        setCountry({ ...data });
+        if (Object.hasOwn(data, "borders")) {
+          Promise.all(
+            data.borders.map((border) => {
+              return fetch(`https://countries.dev/alpha/${border}`).then(
+                (res) => res.json(),
+              );
+            }),
+          ).then((data) =>
+            setCountry((pre) => ({ ...pre, borderCountries: data })),
+          );
+        }
+      });
   }, [countryName]);
 
   console.log(country);
 
-  return country === null ? (
+  return Object.keys(country).length == 0 ? (
     "Loading......"
   ) : (
     <>
@@ -58,7 +69,10 @@ function Country() {
               Language
               <span className="language">{country.languages[0].name}</span>
             </p>
+           
+
           </div>
+
         </div>
       </main>
     </>

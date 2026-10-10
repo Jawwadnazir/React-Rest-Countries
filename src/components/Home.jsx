@@ -13,14 +13,15 @@ function Home() {
       .then((response) => response.json())
       .then((data) => setCountries(data));
   }, []);
-  return (
+
+  return countries.length == 0 ? (
+    <p>Loading Countries</p>
+  ) : (
     <>
       <div className="controls">
         <Search setQuery={setQuery} />
         <Filter setRegion={setRegion} />
       </div>
-
-
 
       <div className="card-container">
         {countries
