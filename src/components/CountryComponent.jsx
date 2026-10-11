@@ -1,33 +1,50 @@
 import "../styles/Country.css";
 import { useState, useEffect } from "react";
-import { data, Link, useParams } from "react-router";
+import { data, Link, useLocation, useParams } from "react-router";
 
 function Country() {
   // const countryName = new URLSearchParams(window.location.search).get("name");
   const countryName = useParams().country;
   const url = `https://countries.dev/name/${countryName}`;
   const [country, setCountry] = useState({});
+  const { state } = useLocation();
 
   useEffect(() => {
-    fetch(url)
-      .then((res) => res.json())
-      .then(([data]) => {
-        setCountry({ ...data });
-        if (Object.hasOwn(data, "borders")) {
-          Promise.all(
-            data.borders.map((border) => {
-              return fetch(`https://countries.dev/alpha/${border}`).then(
-                (res) => res.json(),
-              );
-            }),
-          ).then((data) =>
-            setCountry((pre) => ({ ...pre, borderCountries: data })),
-          );
-        }
-      });
-  }, [countryName]);
+    if (typeof state == "null" && "undefined") {
+      fetch(url)
+        .then((res) => res.json())
+        .then(([data]) => {
+          setCountry({ ...data });
+          if (Object.hasOwn(country, "borders")) {
+            Promise.all(
+              data.borders.map((border) => {
+                return fetch(`https://countries.dev/alpha/${border}`).then(
+                  (res) => res.json(),
+                );
+              }),
+            ).then((data) =>
+              setCountry((pre) => ({ ...pre, borderCountries: data })),
+            );
+          }
+        });
+    } else {
+      setCountry(state);
+      if (Object.hasOwn(state, "borders")) {
+        Promise.all(
+          country.borders.map((border) => {
+            return fetch(`https://countries.dev/alpha/${border}`).then((res) =>
+              res.json(),
+            );
+          }),
+        ).then((data) =>
+          setCountry((pre) => ({ ...pre, borderCountries: data })),
+        );
+      }
+    }
 
-  console.log(country);
+    console.log("State", state);
+    console.log("country", country);
+  }, [countryName]);
 
   return Object.keys(country).length == 0 ? (
     "Loading......"
@@ -43,19 +60,25 @@ function Country() {
           <div className="country-des">
             <p>
               Native Name
-              <span className="native-name">{country.nativeName}</span>
+              <span className="native-name">
+                {country.nativeName || "NO Name"}
+              </span>
             </p>
             <p>
-              Population<span className="population">{country.population}</span>
+              Population
+              <span className="population">
+                {country.population || "No Population"}
+              </span>
             </p>
             <p>
-              Region<span className="region">{country.population}</span>
+              Region<span className="region">{country.region}</span>
             </p>
             <p>
               Sub Region<span className="sub-region">{country.subregion}</span>
             </p>
             <p>
-              Capital<span className="capital">{country.capital}</span>
+              Capital
+              <span className="capital">{country.capital || "No Capital"}</span>
             </p>
             <p>
               Top Level Domain
@@ -63,16 +86,25 @@ function Country() {
             </p>
             <p>
               Currency
-              <span className="currency">{country.currencies[0].name}</span>
+              <span className="currency">
+                {Object.hasOwn(country, "currencies")
+                  ? country.currencies.map((currency) => {
+                      return currency.name;
+                    })
+                  : "No Currency"}
+              </span>
             </p>
             <p>
               Language
-              <span className="language">{country.languages[0].name}</span>
+              <span className="language">
+                {Object.hasOwn(country, "languages")
+                  ? country.languages
+                      .map((language) => language.name)
+                      .join(" ,")
+                  : "No Language "}
+              </span>
             </p>
-           
-
           </div>
-
         </div>
       </main>
     </>

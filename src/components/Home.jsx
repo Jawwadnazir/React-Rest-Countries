@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Search from "./SearchComponent";
 import Filter from "./FilterComponent";
 import Card from "./CardComponent";
-
+import { HomeShimmer } from "./HomeShimmer";
 function Home() {
   const [countries, setCountries] = useState([]);
   const [query, setQuery] = useState("");
@@ -15,7 +15,9 @@ function Home() {
   }, []);
 
   return countries.length == 0 ? (
-    <p>Loading Countries</p>
+    <>
+      <HomeShimmer />
+    </>
   ) : (
     <>
       <div className="controls">
@@ -39,6 +41,7 @@ function Home() {
                 flag={country.flags.svg}
                 region={country.region}
                 population={country.population}
+                countryData={country}
               />
             );
           })}

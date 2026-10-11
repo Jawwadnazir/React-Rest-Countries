@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.card-container {
+  height: 100dvb;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+  justify-content: space-evenly;
+}
+
+.shimmer-card {
+  height: 280px;
+  width: 220px;
+  border-radius: 10px;
+  border: 2px solid black;
+  overflow: none;
+  background-color: rgba(221, 218, 218, 0.836);
+}
