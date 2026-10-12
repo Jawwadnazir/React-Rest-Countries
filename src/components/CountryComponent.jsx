@@ -9,13 +9,14 @@ function Country() {
   const [country, setCountry] = useState({});
   const { state } = useLocation();
 
+  console.log("Country", country);
   useEffect(() => {
-    if (typeof state == "null" && "undefined") {
+    if (!state) {
       fetch(url)
         .then((res) => res.json())
         .then(([data]) => {
           setCountry({ ...data });
-          if (Object.hasOwn(country, "borders")) {
+          if (Object.hasOwn(data, "borders")) {
             Promise.all(
               data.borders.map((border) => {
                 return fetch(`https://countries.dev/alpha/${border}`).then(
@@ -31,7 +32,7 @@ function Country() {
       setCountry(state);
       if (Object.hasOwn(state, "borders")) {
         Promise.all(
-          country.borders.map((border) => {
+          state.borders.map((border) => {
             return fetch(`https://countries.dev/alpha/${border}`).then((res) =>
               res.json(),
             );
@@ -41,10 +42,7 @@ function Country() {
         );
       }
     }
-
-    console.log("State", state);
-    console.log("country", country);
-  }, [countryName]);
+  }, [countryName, state]);
 
   return Object.keys(country).length == 0 ? (
     "Loading......"
@@ -104,6 +102,18 @@ function Country() {
                   : "No Language "}
               </span>
             </p>
+
+            {/* {Object.hasOwn(country, "borderCountries") &&
+              country.borderCountries.length && (
+                <p>
+                  Border Countries{" "}
+                  <span className="border-countries">
+                    {country.borderCountries.map((country) => (
+                      <Link to={`/${country.name}`} />
+                    ))}
+                  </span>
+                </p>
+              )} */}
           </div>
         </div>
       </main>
